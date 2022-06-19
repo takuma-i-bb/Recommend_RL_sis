@@ -56,4 +56,5 @@ function get_link(m::BAmodel, rand::AbstractFloat)::Node
     end
 end
 
+
 end
