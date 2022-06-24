@@ -62,6 +62,25 @@ function updatecategory!(n::Node, c::Int)
             change += (c - n.category) * 0.02
         end
     end
+    n.category += max(min(change, 0.5), -0.5)
+    if n.category >= 5
+        n.category -= 5
+    end
+end
+
+function check_use(n::Node)
+    return (100 * rand() < n.favorite) ? true : false
+end
+
+function recommend!(n::Node, c::Int)
+    updatecategory!(n, c)
+    if n.category == c
+        n.favorite = min(n.category+5, 100)
+    else if isconcern(n, c)
+        n.favorite = min(n.category+3, 100)
+    else
+        n.favorite = max(n.category-5, 0)
+    end
 end
 
 struct BAmodel
@@ -147,6 +166,15 @@ function updatecategory!(m::BAmodel)
     end
 end
 
+function recommend(m::BAmodel)
+    for n in m.node_list
+        if check_use(n)
+            c = use_system(n)
+            recommend!(n, c)
+        end
+    end
+end
+
 function el_draw(m::BAmodel)
     
     for n in m.node_list
@@ -160,6 +188,10 @@ function el_draw(n::Node)
     for n2 in n.link
         draw(Line(floor.(n.pos)[1], floor.(n.pos)[2], floor.(n2.pos)[1], floor.(n2.pos)[2]))
     end
+end
+
+function use_system(n::Node)
+    
 end
 
 WIDTH = 640
